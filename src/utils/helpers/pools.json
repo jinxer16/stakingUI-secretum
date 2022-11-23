@@ -1,0 +1,36 @@
+[
+    {
+        "network": "http://localhost:8899",
+        "stakeDataAddress": "786jxkt8MFD6QQDNkWhoVqS2Xa2b8cr362F5WrkEVHPB",
+        "programId": "FyuYS4mkox1s2YXXhdGKU94vTfd4D3379nCV8DTmWq3S",
+        "toekenName": "Secretum",
+        "toekenSymbol": "SER",
+        "label": "local testnet, SER staking",
+        "value": "0"
+    },
+    {
+        "network": "https://api.testnet.solana.com",
+        "stakeDataAddress": "8AABF4eCWrRstriSstV3o5dY4xa3SYpPZzcCJn9WkKJU",
+        "programId": "67Pwn8f8iyMzBkqqY98soiu5ppo4aPh6zqu1KGBMvwue",
+        "toekenName": "Secretum",
+        "toekenSymbol": "SER",
+        "label": "testnet, SER staking",
+        "value": "1"
+    },
+    {
+        "network": "https://api.devnet.solana.com",
+        "stakeDataAddress": "",
+        "toekenName": "Secretum",
+        "toekenSymbol": "SER",
+        "label": "devnet, SER staking",
+        "value": "2"
+    },
+    {
+        "network": "https://api.devnet.solana.com",
+        "stakeDataAddress": "",
+        "toekenName": "Secretum",
+        "toekenSymbol": "SER",
+        "label": "mainnet, SER staking",
+        "value": "3"
+    }
+]

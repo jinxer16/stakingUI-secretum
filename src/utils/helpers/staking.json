@@ -1,0 +1,656 @@
+{
+  "version": "0.1.0",
+  "name": "staking",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "funderAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "escrowAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewarderAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintAddress",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "minTimeframeInSecond",
+          "type": "u64"
+        },
+        {
+          "name": "minStakePeriod",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initializeStakeState",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "staking",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakeStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "escrowAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakerAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "unstaking",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakeStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "escrowAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewarderAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reclaimer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "stakingAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claimReward",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakeStateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewarderAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "claimer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "stakingAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "funding",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewarderAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "funderAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "timeframeInSecond",
+          "type": "u64"
+        },
+        {
+          "name": "apyMax",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "rewardCalculation",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "refunding",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewarderAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "funderAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "stakingAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "changeSetting",
+      "accounts": [
+        {
+          "name": "stakingData",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "apyMax",
+          "type": "u32"
+        },
+        {
+          "name": "minStakePeriod",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "StakingData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "initializer",
+            "type": "publicKey"
+          },
+          {
+            "name": "funderAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "mintAddress",
+            "type": "publicKey"
+          },
+          {
+            "name": "escrowAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "rewarderAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalFunded",
+            "type": "u64"
+          },
+          {
+            "name": "totalRewardPaid",
+            "type": "u64"
+          },
+          {
+            "name": "bumpAuth",
+            "type": "u8"
+          },
+          {
+            "name": "totalStaked",
+            "type": "u64"
+          },
+          {
+            "name": "minTimeframeInSecond",
+            "type": "u64"
+          },
+          {
+            "name": "timeframeInSecond",
+            "type": "u64"
+          },
+          {
+            "name": "timeframeStarted",
+            "type": "u64"
+          },
+          {
+            "name": "poolReward",
+            "type": "u64"
+          },
+          {
+            "name": "apyMax",
+            "type": "u32"
+          },
+          {
+            "name": "minStakePeriod",
+            "type": "u64"
+          },
+          {
+            "name": "stakers",
+            "type": {
+              "vec": {
+                "defined": "StakerState"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stakingAccount",
+            "type": "publicKey"
+          },
+          {
+            "name": "myCrc",
+            "type": "u32"
+          },
+          {
+            "name": "mintAddress",
+            "type": "publicKey"
+          },
+          {
+            "name": "onwerAddress",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalStaked",
+            "type": "u64"
+          },
+          {
+            "name": "totalRewarded",
+            "type": "u64"
+          },
+          {
+            "name": "lastStaked",
+            "type": "u64"
+          },
+          {
+            "name": "lastRewarded",
+            "type": "u64"
+          },
+          {
+            "name": "history",
+            "type": {
+              "vec": {
+                "defined": "StakerHistoryEntry"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "StakerState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stakerCrc",
+            "type": "u32"
+          },
+          {
+            "name": "stakedTime",
+            "type": "u64"
+          },
+          {
+            "name": "lastCalcTime",
+            "type": "u64"
+          },
+          {
+            "name": "stakedAmount",
+            "type": "u64"
+          },
+          {
+            "name": "gainedReward",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakerHistoryEntry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "time",
+            "type": "u64"
+          },
+          {
+            "name": "action",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "EventInitialize",
+      "fields": [
+        {
+          "name": "xx",
+          "type": "u32",
+          "index": false
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidStakingAccount",
+      "msg": "invalid staking account data"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidStakingStateAccount",
+      "msg": "invalid staking state account data"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidStakingStateAccountCantFindEntry",
+      "msg": "invalid staking state account data. Can`t find entry!"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidStakingStateAccountDosentMatchAmount",
+      "msg": "invalid staking state account data. Desn`t match amount!"
+    },
+    {
+      "code": 6004,
+      "name": "ReachedMaxStakers",
+      "msg": "reached max stakers = 385!"
+    },
+    {
+      "code": 6005,
+      "name": "InSufficientBalance",
+      "msg": "insufficient balance"
+    },
+    {
+      "code": 6006,
+      "name": "InSufficientStakedBalance",
+      "msg": "insufficient staked balance"
+    },
+    {
+      "code": 6007,
+      "name": "InSufficientEscrowBalance",
+      "msg": "insufficient escrow balance"
+    },
+    {
+      "code": 6008,
+      "name": "InSufficientGainedReward",
+      "msg": "insufficient gained reward"
+    },
+    {
+      "code": 6009,
+      "name": "InSufficientRewarderBalance",
+      "msg": "insufficient rewarder reward"
+    },
+    {
+      "code": 6010,
+      "name": "ExistUnClaimedReward",
+      "msg": "exist un-claimed reward"
+    },
+    {
+      "code": 6011,
+      "name": "AmountMustBigThanZero",
+      "msg": "amount must big than zero"
+    },
+    {
+      "code": 6012,
+      "name": "TimeframeMustBigThanMin",
+      "msg": "timeframe must big than min"
+    },
+    {
+      "code": 6013,
+      "name": "TimeframeMustBigThanMinStakePeriod",
+      "msg": "timeframe must big than min stake period"
+    },
+    {
+      "code": 6014,
+      "name": "MinStakePeriodMustBeLessThanCurrentTimeFrame",
+      "msg": "min stake period must less than current timeframe"
+    },
+    {
+      "code": 6015,
+      "name": "ApyMaxMustBigThan100",
+      "msg": "apy max must big than 100"
+    },
+    {
+      "code": 6016,
+      "name": "ApyMaxMustLessThan10000",
+      "msg": "apy max must less than 10000"
+    },
+    {
+      "code": 6017,
+      "name": "MinTimeFrameMustBigThanZero",
+      "msg": "min timeframe must big than zero"
+    },
+    {
+      "code": 6018,
+      "name": "MinStakePeriodMustBigThanZero",
+      "msg": "min stake period must big than zero"
+    },
+    {
+      "code": 6019,
+      "name": "CurrentTimeFrameWasntFinished",
+      "msg": "Current timeframe wasn`t finished"
+    },
+    {
+      "code": 6020,
+      "name": "TimeFrameWasntStarted",
+      "msg": "timeframe wasn`t started"
+    }
+  ]
+}

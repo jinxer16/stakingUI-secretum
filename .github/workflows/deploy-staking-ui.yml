@@ -1,0 +1,116 @@
+name: Deploy Staking UI
+env:
+  AWS_ECR_REPOSITORY: staking-ui
+  AWS_REGION: ap-southeast-1
+  DOCKER_FILE: Dockerfile
+  BRANCH_NAME: "${{ github.ref_name }}"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ env.BRANCH_NAME }}-${{ steps.vars.outputs.sha_short }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          
+      - name: Set docker image tag
+        id: vars
+        run: |
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+          echo "SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Check docker image tag outputs
+        run: echo ${{ steps.vars.outputs.sha_short }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Available Buildx platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.AWS_ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ env.SHA_SHORT }}
+          DOCKER_BUILDKIT: 1
+        run: |
+          docker build -f ${{ env.DOCKER_FILE }} --build-arg MY_GITHUB_TOKEN=${{ secrets.SCRETUM_GITHUB_TOKEN }} \
+              -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{needs.build.outputs.image_tag}}
+      #IMAGE_TAG: develop-677fb2a
+    outputs:
+      app_url: ${{ steps.set_app_url.outputs.app_url }}
+    steps:
+      - name: Add profile credentials to ~/.aws/credentials
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
+        run: |
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID --profile heapmoney
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY --profile heapmoney
+
+      - name: Setup python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3
+
+      - name: Install python boto3, ansible
+        run: |
+          pip install boto3 ansible==2.9.2 requests
+
+      - name: Clone Ansible deploy scripts
+        uses: actions/checkout@master
+        with:
+          repository: SecretumOfficial/secretum-staking-server
+          token: ${{ secrets.SCRETUM_GITHUB_TOKEN }}
+          path: ./secretum-staking-server
+
+      - name: set ansible config secrets
+        env:
+          SSH_KEY: ${{secrets.DEV_SSH_PRIVATE_KEY}}
+        run: |
+          mkdir .ssh
+          echo "$SSH_KEY" > .ssh/id_rsa
+          chmod 600 .ssh/id_rsa
+
+      - name: Run ansible playbook
+        run: |
+          cd secretum-staking-server
+          ansible-playbook ansible/tasks.yaml -u ${{ secrets.DEV_SSH_USER }} -i ansible/inventory_aws_ec2.yml -e "web_client_image_tag=$IMAGE_TAG" --private-key ../.ssh/id_rsa --tag="deploy_staking" --verbose
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+            SLACK_USERNAME: secretumCI
